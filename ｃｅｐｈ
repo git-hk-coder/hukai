@@ -1,0 +1,109 @@
+　　　　　　　　　　　　　　　　　　　　　　　　　　　CEPH
+
+1.CEPH　默认三副本（可以更多）三个电脑存贮数据，必须同时坏了，才能坏了．----高可用
+　　　　　　　　高拓展　　　　１Ｇ拆成三个３００Ｍ同时给三个机子写　－－－高性能
+　　可以提供对象存储．块存储，文件系统存储
+软件存储
+ ssh-keygen   -f /root/.ssh/id_rsa    -N ''　　配的是私钥
+　ssh-copy-id  192.168.4.$i　　传给每台机子
+秘钥在ｎｏｄｅ１上做的在ｎｏｄｅ１　上做切换　　传秘钥给它们链接他们不需要密码
+先ｙｕｍ　ｃｌｅａｎ　　在ｙｕｍ　ｒｅｐｏｌｉｓｔ
+ｃｅｐｈ－ｄｅｐｌｏｙ　给别的机子自动装ｃｅｐｈ的Ｐｙｔｈｏｎ的脚本
+  mkdir ceph-cluster建这个目录　执行上面脚本时必须进入这个目录执行
+ｃｅｐｈｘ是密码占位符．．．．．．
+ｏｓｄ－－－－－＞共享磁盘（三副本）
+ｍｏｎ－－－－－－－＞类似前端的调度器＞＞知道后台机子多少做存储带健康检查
+ｍｏｎｉｔｏｒ（最少三台）（过半原则：必须一半上能用，没有过半全部崩溃）
+ｏｓｄ与ｍｏｎ分开做
+ｒｐｍ－ｑａ｜　ｇｒｅｐ　ｃｅｐｈ查看哪几个包装好了
+ceph-deploy mon create-initial先把三个配置文件考到／ｅｔｃ／ｃｅｐｈ下　然后再自动起服务．
+重启后权限消失
+启动ｏｓｄ把ｖｄｃ vdd 共享出去用＠数字区分
+for i in node{1..6}
+do
+ ssh $i yum -y install ceph-mon
+done装包
+ceph new node1 node2 node3生成配置
+ceph-deploy mon create-initial起服务
+
+远程ｎｏｄｅ４　～ｎｏｄｅ６
+给ｖｄｂ分区式化（反存盘），格式化ｖｄｃ和ｖｄｄ
+启动ｏｓｄ
+
+数据丢了有共享盘可以用快照还原下
+1.环境准备
+2部署ceph集群
+给所有主机安装ceph软件mon,osd,mds,radosgw
+ceph-deploy new 1 2 3
+ceph-deploy new create-initial
+
+把缓存盘格式化vdb1   vdb2
+ceph-deploy disk  zap
+
+
+image ---->rbd1---->/mnt/a.txt
+    (主机)                   (客户机)
+文件 删掉    快照不支持在线还原(需要把挂载去掉)
+1.rbd create 共享1(资料)
+2.克隆创建镜像 (资料还有)
+dachui(资料) --->快照(一旦生成就不变了)----->克隆
+                      (保护)          资料变了
+克隆好之前 快照备删了会有问题, 所以保护它.
+
+
+ceph的用法
+1.ceph块共享(需要格式化 挂载)
+2.给虚拟机添加云盘(需要格式化 ,挂载)
+3.文件系统共享(nfs  ,samba ----客户端(挂载使用))-------不用格式化直接挂载使用
+
+kvm虚拟机(vda)
+//var/lib/libvirt/images/yy.qcow2(真机磁盘)
+/etc/libvirt/qemu/yy.xml 所有虚拟机的配置都是这个 虚拟机对这配置文件没有权限  在真机上改 用virsh  edit  改配置
+virsh define yy.xml 
+
+物理机(vm1 vm2  vm3)
+虚拟机用物理机的磁盘 ,物理机坏了虚拟机全坏,
+物理机(新建虚拟机-调用ceph云盘)物理机坏了,不用重装系统,
+虚拟机(挂载下就能用了调用云盘)
+
+systemctl status ceph-mds@node3  查询mds有没有启服. 
+ceph-deploy purgedata node1  node2   删掉ceph的数据
+                purge               删掉ceph的软件包
+ceph的缺点仅支持一个文件系统共享.
+
+
+
+
+三次握手
+client   server
+client发送sys请求链接  一次
+server会回ack+sys   请求加确认  两次
+client会回ack   确认   三次
+四次挥手
+client发送 FIN 请求断开 
+server发送确认断开
+server再发送FIN 请求断开
+client(等待)发送确认
+
+两次都是看两个机子发送数据是否正常,是否能断开.
+
+
+raid0 是两块 盘一对一个储存  可以高效读写，硬盘空间利用率100%
+raid1 是复制量两块盘都储存    raid1是复制卷可以实现数据的高可靠读写硬盘空间利用率                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+raid5  三块盘带奇偶检验    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
